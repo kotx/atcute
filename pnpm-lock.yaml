@@ -489,6 +489,25 @@ importers:
         specifier: workspace:^
         version: link:../../definitions/atproto
 
+  packages/servers/xrpc-server:
+    dependencies:
+      '@atcute/lexicons':
+        specifier: workspace:^
+        version: link:../../lexicons/lexicons
+    devDependencies:
+      '@atcute/atproto':
+        specifier: workspace:^
+        version: link:../../definitions/atproto
+      '@atcute/bluesky':
+        specifier: workspace:^
+        version: link:../../definitions/bluesky
+      '@vitest/coverage-v8':
+        specifier: ^3.0.4
+        version: 3.1.3(vitest@3.1.3(@types/node@22.15.17))
+      vitest:
+        specifier: ^3.0.4
+        version: 3.1.3(@types/node@22.15.17)
+
   packages/utilities/car:
     dependencies:
       '@atcute/cbor':
