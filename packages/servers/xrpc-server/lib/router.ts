@@ -124,9 +124,9 @@ export class XRPCRouter {
 		};
 	}
 
-	procedure<TProcedure extends XRPCProcedureMetadata>(
+	procedure<TProcedure extends XRPCProcedureMetadata, const TConfig extends ProcedureConfig<TProcedure>>(
 		procedure: TProcedure,
-		config: ProcedureConfig<TProcedure>,
+		config: TConfig,
 	): void {
 		const handleParams = procedure.params ? constructParamsHandler(procedure.params) : null;
 
@@ -216,21 +216,30 @@ const isBodyPresent = (headers: Headers): boolean => {
 	return headers.get('content-length') !== null && headers.get('transfer-encoding') !== null;
 };
 
-import { AppBskyActorGetProfile } from '@atcute/bluesky';
+import { AppBskyActorGetProfile, AppBskyFeedGetPostThread } from '@atcute/bluesky';
+import { ComAtprotoSyncGetBlob } from '@atcute/atproto';
+import { json } from './types/response.js';
 
 const router = new XRPCRouter();
-router.query(AppBskyActorGetProfile.mainSchema, {
+router.query(AppBskyFeedGetPostThread.mainSchema, {
 	handler: async ({ params }) => {
-		return {
-			did: 'did:web:mary.my.id',
-			handle: 'mary.my.id',
-		};
+		return json({
+			thread: {
+				$type: 'app.bsky.feed.defs#threadViewPost',
+				post: {} as any,
+				replies: [
+					{
+						$type: 'app.bsky.feed.defs#threadViewPost',
+						post: {} as any,
+					},
+				],
+			},
+		});
 	},
 });
 
-const handler: QueryHandler<AppBskyActorGetProfile.mainSchema> = async ({ params }) => {
-	return {
-		did: 'did:web:mary.my.id',
-		handle: 'mary.my.id',
-	};
-};
+router.query(ComAtprotoSyncGetBlob.mainSchema, {
+	async handler({ params }) {
+		return json(new Uint8Array(2));
+	},
+});

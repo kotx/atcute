@@ -7,6 +7,7 @@ import type {
 } from '@atcute/lexicons/validations';
 
 import type { Literal, Promisable } from './misc.js';
+import type { BlobResponse, JSONResponse } from './response.js';
 
 export type UnknownOperationContext = {
 	request: Request;
@@ -28,11 +29,13 @@ export type QueryContext<TQuery extends XRPCQueryMetadata> = {
 
 export type QueryHandler<TQuery extends XRPCQueryMetadata> = (
 	context: QueryContext<TQuery>,
-) => TQuery['output'] extends null
-	? Promisable<void>
-	: TQuery['output'] extends XRPCLexBodyParam
-		? Promisable<InferOutput<TQuery['output']['schema']>>
-		: Promisable<Response>;
+) => Promisable<
+	TQuery['output'] extends null
+		? Response | void
+		: TQuery['output'] extends XRPCLexBodyParam
+			? Response | JSONResponse<InferOutput<TQuery['output']['schema']>>
+			: Response | BlobResponse
+>;
 
 export type QueryConfig<TQuery extends XRPCQueryMetadata = XRPCQueryMetadata> = {
 	handler: QueryHandler<TQuery>;
@@ -59,11 +62,13 @@ export type ProcedureContext<TProcedure extends XRPCProcedureMetadata> = {
 
 export type ProcedureHandler<TProcedure extends XRPCProcedureMetadata> = (
 	context: ProcedureContext<TProcedure>,
-) => TProcedure['output'] extends null
-	? Promisable<void>
-	: TProcedure['output'] extends XRPCLexBodyParam
-		? Promisable<InferOutput<TProcedure['output']['schema']>>
-		: Promisable<Response>;
+) => Promisable<
+	TProcedure['output'] extends null
+		? Response | void
+		: TProcedure['output'] extends XRPCLexBodyParam
+			? Response | InferOutput<TProcedure['output']['schema']>
+			: Response
+>;
 
 export type ProcedureConfig<TProcedure extends XRPCProcedureMetadata = XRPCProcedureMetadata> = {
 	handler: ProcedureHandler<TProcedure>;
